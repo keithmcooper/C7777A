@@ -232,7 +232,7 @@ agg=read.csv("DATA/PARTBAGG05022017.csv", header=T,
 
 ## View aggreation file
 View(agg)
-
+names(agg)
 ## Join the aggregation file to data
 alla=cbind(agg,t_dataparta)
 
@@ -246,7 +246,7 @@ dim(alla2)# note the total number of columns
 View(alla2)# identify the col nos for Family and samples
 
 ## Take only the Family and sample columns
-alla2fam=alla2[,c(19,31:21131)]
+alla2fam=alla2[,c(13,31:21131)]
 
 ## Remove objects that are no longer required to free up memory
 rm(alla)
@@ -260,8 +260,8 @@ gc()
 rm(dataparta2)
 gc()
 
-## Aggregate data (sum) by family for multiple samples
-famabundPARTA=aggregate(. ~ Family, alla2fam, sum)
+## Aggregate data (sum) by ScientificName_accepted for multiple samples
+famabundPARTA=aggregate(. ~ ScientificName_accepted, alla2fam, sum)
 
 ## Remove objects that are no longer required to free up memory
 rm(alla2fam)
@@ -270,7 +270,7 @@ rm(agg)
 gc()
 
 ## Write file and close
-write.csv(famabundPARTA,file = "DATA/famabundPARTA.csv",row.names=TRUE)
+write.csv(famabundPARTA,file = "DATA/speciesabundPARTA.csv",row.names=TRUE)
 
 #################################################################################################
 ### STEP REF:       4                                                                         ###  
@@ -308,22 +308,22 @@ allb=cbind(agg,t_datapartb)
 allb2 = subset(allb, Include=='Y')
 names(allb2)
 
-## Take only the Family col and the sample cols (NB Impossible to aggregate other factor cols)
-allb2fam=allb2[,c(19,31:12127)]
+## Take only the ScientificName_accepted col and the sample cols (NB Impossible to aggregate other factor cols)
+allb2fam=allb2[,c(13,31:12127)]
 
 ## Remove objects that are no longer required to free up memory
 rm(agg,allb,allb2,datapartb,datapartb2,t_datapartb)
 gc()
 
 ## Sum by family for multiple samples
-famabundPARTB=aggregate(. ~ Family, allb2fam, sum)
+famabundPARTB=aggregate(. ~ ScientificName_accepted, allb2fam, sum)
 
 ## Remove objects that are no longer required to free up memory
 rm(allb2fam)
 gc()
 
 ## Write file
-write.csv(famabundPARTB,file = "DATA/famabundPARTB.csv",row.names=TRUE)
+write.csv(famabundPARTB,file = "DATA/speciesabundPARTB.csv",row.names=TRUE)
 
 ## Remove objects that are no longer required to free up memory
 rm(famabundPARTA,famabundPARTB)
@@ -334,11 +334,11 @@ gc()
 ###                                                                                           ###
 ### PAPER SECTION:  ALL                                                                       ###
 ###                                                                                           ###
-### TASK:           Build family abundance matrix from Parts A & B                            ###
+### TASK:           Build species abundance matrix from Parts A & B                            ###
 #################################################################################################
 
 ## Load data from Part A
-famabundPARTA=read.csv("DATA/famabundPARTA.csv", header=T,na.strings=c("NA", "-","?","<null>"),
+famabundPARTA=read.csv("DATA/speciesabundPARTA.csv", header=T,na.strings=c("NA", "-","?","<null>"),
                        stringsAsFactors=F,check.names=FALSE)
 
 ## View df 'famabundPARTA'
@@ -351,7 +351,7 @@ famabundPARTA[1]=NULL
 dim(famabundPARTA)#774 21102
 
 ## Load data from Part B
-famabundPARTB=read.csv("DATA/famabundPARTB.csv", header=T,na.strings=c("NA", "-","?","<null>"),
+famabundPARTB=read.csv("DATA/speciesabundPARTB.csv", header=T,na.strings=c("NA", "-","?","<null>"),
                        stringsAsFactors=F,check.names=FALSE)
 
 ## Remove 1st column
@@ -364,7 +364,7 @@ View(famabundPARTB)
 dim(famabundPARTB)#774 12098
 
 ## Merge the dataframes 'famabundPARTA' and 'famabundPARTB'
-total <- merge(famabundPARTA,famabundPARTB,by="Family")
+total <- merge(famabundPARTA,famabundPARTB,by="ScientificName_accepted")
 
 ##Check dimensions of df 'total'
 dim(total)#774 33199
@@ -421,11 +421,11 @@ datapartb2other=datapartb[,c(1,13451:13575)]
 ## Join together df 'dataparta2other' and 'datapartb2other' (other variables -  parts A and B)
 datapartab2other=rbind(dataparta2other,datapartb2other)
 
-## Merge faunal (family) matrix with other variables
+## Merge faunal (species) matrix with other variables
 data <- merge(t_total,datapartab2other,by="Sample")
 
 ## Check dimensions of df 'data'
-dim(data)# 33198 900
+dim(data)# 33198 4147
 
 ## Check names of df 'data'
 names(data)
@@ -434,7 +434,7 @@ names(data)
 View(data)
 
 ## Save df 'data' (Sample/variable matrix, Family level)
-write.csv(data,file = "DATA/C5922DATASETFAM13022017.csv",row.names=TRUE)
+write.csv(data,file = "DATA/C5922DATASETSPECIES13022017.csv",row.names=TRUE)
 
 ## Remove objects that are no longer required to free up memory
 rm(data,dataparta,dataparta2other,datapartab2other,datapartb,datapartb2other,famabundPARTA,
@@ -453,11 +453,11 @@ gc()
 ### TASK:           Load dataset                                                              ###
 ###                                                                                           ###
 ### NOTES:          The dataset is a sample by variable matrix. Variables include faunal taxa ###
-###                 (family), sediment data, metadata and other explanatory variables         ###
+###                 (species), sediment data, metadata and other explanatory variables         ###
 #################################################################################################
 
 ## Read in data
-data=read.csv("DATA/C5922DATASETFAM13022017.csv", header=T,na.strings=c("NA", "-","?","<null>"),
+data=read.csv("DATA/C5922DATASETSPECIES13022017.csv", header=T,na.strings=c("NA", "-","?","<null>"),
               stringsAsFactors=F,check.names=FALSE)
 
 ## Remove 1st col
@@ -483,545 +483,6 @@ length(rle(sort(data$Survey))$values)# 777
 ## Number of samples by Survey
 table(data$Survey)
 
-#################################################################################################
-# # #                             (C) PREPARE MAPPING LAYERS                                # # #
-#################################################################################################
-
-#################################################################################################
-### STEP REF:       8                                                                         ###  
-###                                                                                           ###
-### PAPER SECTION:  ALL                                                                       ###
-###                                                                                           ###
-### TASK:           Create layers for use in maps                                             ###
-#################################################################################################
-## Install packages 
-#install.packages("ggplot2")
-#install.packages("rgdal")
-#install.packages("maptools")
-#install.packages("plyr")
-
-## Call packages
-library(ggplot2)
-library(rgdal)
-library(maptools)
-library(plyr)
-
-## Produce a high definition european coast map
-# Load shapefile
-eu <- readOGR("DATA","EUROPE")
-eu@data$id <- rownames(eu@data)
-
-## Create a data.frame from our spatial object
-euDF <- fortify(eu, region = "id")
-
-## Merge the "fortified" data with the data from our spatial object. Object euDF 
-# is a dataframe of the polygon coordinates.  This is combined with the other attribute
-# data from object eu
-euDF2 <- merge(euDF, eu@data, by = "id")
-
-## Create layer for coastline including borders between UK countries
-eubound = readOGR("DATA","EuropeLiteScoWal")
-eubound@data$id = rownames(eubound@data)
-eubound.points = fortify(eubound, region="id")
-eubound.df = join(eubound.points, eubound@data, by="id")
-
-## Create layer for 'Licensed' polygons
-licence = readOGR("DATA","Aggregates_Licence_20151112")
-licence@data$id = rownames(licence@data)
-licence.points = fortify(licence, region="id")
-licence.df = join(licence.points, licence@data, by="id")
-
-## Create layer for 'Application' polygons
-appl = readOGR("DATA","Aggregates_Application_20150813")
-appl@data$id = rownames(appl@data)
-appl.points = fortify(appl, region="id")
-appl.df = join(appl.points, appl@data, by="id")
-
-## Create layer for HUMBER AGGREGATE INTEREST
-hum = readOGR("DATA","HUMBERLICANDAPP")
-hum@data$id = rownames(hum@data)
-hum.points = fortify(hum, region="id")
-hum.df = join(hum.points, hum@data, by="id")
-
-## Create layer for HUMBER SIZ
-humSIZ = readOGR("DATA","H_SIZ_PSD_POLYGONS_UNION_2014")
-humSIZ@data$id = rownames(humSIZ@data)
-humSIZ.points = fortify(humSIZ, region="id")
-humSIZ.df = join(humSIZ.points, humSIZ@data, by="id")
-
-## Create layer for HUMBER APP AREA 492
-humapp492 = readOGR("DATA","H_492_PIZ_APP")
-humapp492@data$id = rownames(humapp492@data)
-humapp492.points = fortify(humapp492, region="id")
-humapp492.df = join(humapp492.points, humapp492@data, by="id")
-
-## Create layer for ANGLIAN AGGREGATE INTEREST
-ang = readOGR("DATA","ANGLIANLICANDAPP")
-ang@data$id = rownames(ang@data)
-ang.points = fortify(ang, region="id")
-ang.df = join(ang.points, ang@data, by="id")
-
-## Create layer for ANGLIAN SIZ
-angSIZ = readOGR("DATA","A_SIZ_PSD_POLYGONS_UNION")
-angSIZ@data$id = rownames(angSIZ@data)
-angSIZ.points = fortify(angSIZ, region="id")
-angSIZ.df = join(angSIZ.points, angSIZ@data, by="id")
-
-## Create layer for THAMES AGGREGATE INTEREST
-tha = readOGR("DATA","THAMESLICANDAPP")
-tha@data$id = rownames(tha@data)
-tha.points = fortify(tha, region="id")
-tha.df = join(tha.points, tha@data, by="id")
-
-## Create layer for THAMES SIZ
-thaSIZ = readOGR("DATA","T_SIZ_PSD_POLYGONS_UNION_REV_2014")
-thaSIZ@data$id = rownames(thaSIZ@data)
-thaSIZ.points = fortify(thaSIZ, region="id")
-thaSIZ.df = join(thaSIZ.points, thaSIZ@data, by="id")
-
-## Create layer for THAMES AREA 501/2 SIZ
-tha5012SIZ = readOGR("DATA","T_501_1_2_SIZ_PSD")
-tha5012SIZ@data$id = rownames(tha5012SIZ@data)
-tha5012SIZ.points = fortify(tha5012SIZ, region="id")
-tha5012SIZ.df = join(tha5012SIZ.points, tha5012SIZ@data, by="id")
-
-## Create layer for EEC AGGREGATE INTEREST
-eec = readOGR("DATA","EECLICANDAPP")
-eec@data$id = rownames(eec@data)
-eec.points = fortify(eec, region="id")
-eec.df = join(eec.points, eec@data, by="id")
-
-## Create layer for EEC SIZs
-eecSIZ = readOGR("DATA","EC_SIZ_PSD_POLYGONS_UNION_REV")
-eecSIZ@data$id = rownames(eecSIZ@data)
-eecSIZ.points = fortify(eecSIZ, region="id")
-eecSIZ.df = join(eecSIZ.points, eecSIZ@data, by="id")
-
-## Create layer for S. COAST AGGREGATE INTEREST
-sc = readOGR("DATA","SCOASTLICANDAPP")
-sc@data$id = rownames(sc@data)
-sc.points = fortify(sc, region="id")
-sc.df = join(sc.points, sc@data, by="id")
-
-## Create layer for S. COAST SIZs
-scSIZ = readOGR("DATA","SC_SIZ_PSD_POLYGONS_UNION")
-scSIZ@data$id = rownames(scSIZ@data)
-scSIZ.points = fortify(scSIZ, region="id")
-scSIZ.df = join(scSIZ.points, scSIZ@data, by="id")
-
-## Create layer for BRISTOL CHANNEL AGGREGATE INTEREST
-bc = readOGR("DATA","BRISTOLCHANNELLICANDAPP")
-bc@data$id = rownames(bc@data)
-bc.points = fortify(bc, region="id")
-bc.df = join(bc.points, bc@data, by="id")
-
-## Create layer for BRISTOL CHANNEL SIZ
-bcSIZ = readOGR("DATA","BC_SIZ2")
-bcSIZ@data$id = rownames(bcSIZ@data)
-bcSIZ.points = fortify(bcSIZ, region="id")
-bcSIZ.df = join(bcSIZ.points, bcSIZ@data, by="id")
-
-## Create layer for NORTH WEST AGGREGATE INTEREST
-nw = readOGR("DATA","NORTHWESTLICANDAPP")
-nw@data$id = rownames(nw@data)
-nw.points = fortify(nw, region="id")
-nw.df = join(nw.points, nw@data, by="id")
-
-## Create layer for Area 457 SIZ (NORTH WEST REGION)
-nw457SIZ = readOGR("DATA","AREA_457_PSD")
-nw457SIZ@data$id = rownames(nw457SIZ@data)
-nw457SIZ.points = fortify(nw457SIZ, region="id")
-nw457SIZ.df = join(nw457SIZ.points, nw457SIZ@data, by="id")
-
-## Create layer for Area 392 SIZ (PSD Zone)
-nw392SIZ = readOGR("DATA","NW_392_SIZ_PSD_LICENCE_EXISTING")
-nw392SIZ@data$id = rownames(nw392SIZ@data)
-nw392SIZ.points = fortify(nw392SIZ, region="id")
-nw392SIZ.df = join(nw392SIZ.points, nw392SIZ@data, by="id")
-
-## Goodwin licence 
-goodwinlic = readOGR("DATA","GOODWIN LICENCE FINAL POLYGON")
-goodwinlic@data$id = rownames(goodwinlic@data)
-goodwinlic.points = fortify(goodwinlic, region="id")
-goodwinlic.df = join(goodwinlic.points, goodwinlic@data, by="id")
-
-## Create layer for Goodwin SIZ (10mg)
-goodwinSIZ = readOGR("DATA","GoodwinSIZ")
-goodwinSIZ@data$id = rownames(goodwinSIZ@data)
-goodwinSIZ.points = fortify(goodwinSIZ, region="id")
-goodwinSIZ.df = join(goodwinSIZ.points, goodwinSIZ@data, by="id")
-
-## Defra DEM (bathy) 
-defra.dem = readOGR("DATA","DEFRADEMKC8")
-defra.dem$id = rownames(defra.dem@data)
-defra.dem.points = fortify(defra.dem, region="id")
-defra.dem.df = join(defra.dem.points, defra.dem@data, by="id")
-defra.dem.df$Depth = factor(defra.dem.df$Depth,levels(defra.dem.df$Depth)[c(1,2,5,8,9,10,3,6,11,
-                                                                            4,7)])
-levels(defra.dem.df$Depth)
-
-## Create grey scale colour palette for use with bathy fill. 0=black, 1=white
-grey=grey.colors(11, start = 0.95, end = 0.5,  alpha = NULL,gamma = 2.2)#, end=0.01
-
-#################################################################################################
-# # #                                  (D) DATASET SUMMARY                                  # # #
-#################################################################################################
-
-#################################################################################################
-## STEP REF:       9                                                                          ###  
-##                                                                                            ###
-## PAPER SECTION:  INTRODUCTION                                                               ###
-##                                                                                            ###
-## TASK:           Figure 1a (Study area showing locations of aggregate dredging interest)    ###
-#################################################################################################
-
-## Enter box coordinates
-hum=data.frame(x1=c(0), x2=c(2.6),y1=c(53.1), y2=c(53.9),t=c('a'), r=c("A"))
-ang=data.frame(x1=1.7, x2=2.5,y1=52.155, y2=52.9,t=c('a'), r=c("A"))
-tha=data.frame(x1=1.3, x2=2.5,y1=51.5, y2=52.14,t=c('a'), r=c("A"))
-good=data.frame(x1=1.3, x2=1.8,y1=51.0, y2=51.4,t=c('a'), r=c("A"))
-sc=data.frame(x1=-1.9, x2=0.85,y1=50.3, y2=50.9,t=c('a'), r=c("A"))
-ec=data.frame(x1=0, x2=1,y1=50.2, y2=50.6,t=c('a'), r=c("A"))
-bc=data.frame(x1=-2.55, x2=-4.8,y1=51.1, y2=51.65,t=c('a'), r=c("A"))
-nw=data.frame(x1=-3.2, x2=-3.8,y1=53.3, y2=53.8,t=c('a'), r=c("A"))
-
-## Plot map
-studyarea=ggplot()+
-  geom_polygon(data=defra.dem.df, aes(x=long, y=lat, group=group,fill=Depth), size=0.15)+
-  scale_fill_manual(values=grey)+
-  geom_polygon(data = euDF2, aes(x=long, y=lat, group = group),fill="white",colour="black",
-               size=0.15)+
-  geom_polygon(data=goodwinlic.df, aes(x=long, y=lat, group=group), colour="orange",
-               fill="orange",size=0.3,fill=NA)+#Goodwin Sands Extraction Area
-  geom_polygon(data=ang.df, aes(x=long, y=lat, group=group), colour="limegreen",fill="limegreen",
-               size=0.3,fill=NA)+#Anlian interest areas
-  geom_polygon(data=tha.df, aes(x=long, y=lat, group=group), colour="yellow",fill="yellow",
-               size=0.3,fill=NA)+#Thames interest areas  
-  geom_polygon(data=hum.df, aes(x=long, y=lat, group=group), colour="blue",fill="blue",
-               size=0.3,fill=NA)+#Humber interest areas
-  geom_polygon(data=humapp492.df, aes(x=long, y=lat, group=group), colour="blue",fill="blue",
-               size=0.3,fill=NA)+#Humber Area 492 Application Area 
-  geom_polygon(data=eec.df, aes(x=long, y=lat, group=group), colour="purple",fill="purple",
-               size=0.3,fill=NA)+#EEC interest areas 
-  geom_polygon(data=sc.df, aes(x=long, y=lat, group=group), colour="red",fill="red",
-               size=0.3,fill=NA)+#S. Coast interest areas 
-  geom_polygon(data=bc.df, aes(x=long, y=lat, group=group), colour="deeppink2",fill="deeppink",
-               size=0.3,fill=NA)+#Bristol Channel interest areas   
-  geom_polygon(data=nw.df, aes(x=long, y=lat, group=group), colour="brown", fill="brown",
-               size=0.3,fill=NA)+#North-west interest areas 
-  labs(x="Longitude",y="Latitude")+ 
-  coord_map(xlim = c(-10.7, 4),ylim = c(48.6, 62.7))+
-  theme_bw(base_size=24)+
-  geom_rect(data=hum, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="blue",alpha=0,
-            linetype=3,size=0.8)+# Humber region bounding box
-  geom_rect(data=ang, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="limegreen",alpha=0,
-            linetype=3,size=0.8)+# Anglian region bounding box
-  geom_rect(data=tha, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="yellow",alpha=0,
-            linetype=3,size=0.8)+# Thames region bounding box 
-  geom_rect(data=good, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="orange",alpha=0,
-            linetype=3,size=0.8)+# South Coast region bounding box
-  geom_rect(data=sc, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="red",alpha=0,
-            linetype=3,size=0.8)+# South Coast region bounding box
-  geom_rect(data=ec, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="purple",
-            alpha=0,linetype=3,size=0.8)+# East Channelregion bounding box
-  geom_rect(data=bc, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="deeppink2",
-            alpha=0,linetype=3,size=0.8)+# Bristol Channelregion bounding box
-  geom_rect(data=nw, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="brown",
-            alpha=0,linetype=3,size=0.8)+# North-west region bounding box  
-  annotate("text",x=c(2.33,-6,-1.1,-4.75,1,-8.5,-5.5),y=c(54.9,51.3,50.19,53.9,56.5,50,59.25),
-           label=c("Dogger \n Bank", "Celtic \nSea","English Channel","Irish Sea","North Sea",
-                   "Celtic \nShelf","Hebridean \n Shelf"),color="white", size=8)+
-  annotate("text",x=c(-1.5),y=c(52.5),label=c("UK"),color="black", size=9)# UK label
-
-
-fig1a=studyarea+guides(fill=FALSE)# removes bathy legend
-
-#################################################################################################
-### STEP REF:       10                                                                        ###  
-###                                                                                           ###
-### PAPER SECTION:  2. METHODS\2.1 The dataset                                                ###
-###                                                                                           ###
-### TASK:           Figure 1b (Sample locations and extent of submaps used in Figure 7)       ###
-#################################################################################################
-
-## Enter box coordinates
-d=data.frame(x1=c(-1,0.8,0.8,-0.6,-2.7,-5,-5), x2=c(1.5,3.3,3.3,1.9,-0.2,-2.5,-2.5),
-             y1=c(52.8,52.9,51.5,50.1,50,50.5,53.2), y2=c(54.3,54.4,53.0,51.6,51.5,52,54.7),
-             t=c('a','b','c','d','e','f','g'), r=c("a","b","c","d","e","f","g"))
-
-## Plot map
-sam.pos=ggplot()+
-  geom_polygon(data=defra.dem.df, aes(x=long, y=lat, group=group,fill=Depth), size=0.15)+
-  scale_fill_manual(values=grey)+
-  geom_point(data=data,aes(Longitude_WGS84,Latitude_WGS84),col="red", size=0.1, alpha=0.8)+
-  geom_polygon(data = eubound, aes(x=long, y=lat, group = group),fill="white",colour="black",
-               size=0.15)+
-  labs(x="Longitude",y="Latitude")+ 
-  coord_map(xlim = c(-10.7, 4),ylim = c(48.6, 62.7))+
-  theme_bw(base_size=24)+
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  geom_rect(data=d, mapping=aes(xmin=x1, xmax=x2, ymin=y1, ymax=y2), color="black",alpha=0,
-            size=0.3)+ 
-  geom_text(data=d, aes(x=x1+(x2-x1)/2, y=y1+(y2-y1)/2, label=r), size=9, colour="black")+
-  annotate("text",x=c(-1,-3.9,-3.6,-6.8),y=c(52.2,56.8,52.55,54.6),
-           label=c("England", "Scotland","Wales", "Northern \n Ireland"),color="dark grey",
-           size=7.2, angle=c(0,0,90,0))# Country labels
-
-fig1b=sam.pos+ theme(legend.key.size=unit(1,"cm"))+ labs(fill="Depth (m)")
-
-#################################################################################################
-### STEP REF:       11                                                                        ###  
-###                                                                                           ###
-### PAPER SECTION:  INTRODUCTION                                                              ###
-###                 METHODS \ The dataset                                                     ###
-###                                                                                           ###
-### TASK:           Figure 1 Parts a & b combined (study area and sample locations)           ###
-###                                                                                           ###
-### NOTES:          Use this code if a plot combining parts a and b is required               ###
-#################################################################################################
-
-require(cowplot)
-
-## Save plot to an image file (png or tiff).
-png("OUTPUTS/FIGURE 1.png",width=53, height=37, units="cm", res=600)
-#tiff("OUTPUTS/FIGURE 1.tiff",width=53, height=37, units="cm", res=600)
-
-plot_grid(fig1a,fig1b, labels = c("a)","b)"),nrow = 1,label_size = 24,rel_widths = c(1, 1.2)) 
-dev.off()
-
-#################################################################################################
-### STEP REF:       12                                                                        ###  
-###                                                                                           ###
-### PAPER SECTION:  METHODS \ The dataset                                                     ###
-###                                                                                           ###
-### TASK:           Prepare the data for Figure 11 (Dataset summary maps and histograms)      ###
-#################################################################################################
-
-## Identify required variables for faceting
-names(data)
-
-## Create a subset of the required data ("Latitude_WGS84","Longitude_WGS84","Sector","Source",
-# "Data","Year","Month","Gear","Sieve"","Programme","Treatment")
-facdat1=data[,c(878,879,884,885,898,882,883,880,881,899,887)]
-
-## Check required variables are there 
-names(facdat1)# they are
-
-## Melt data into form for faceting
-library(reshape2)
-facdat2=melt(facdat1,c("Latitude_WGS84","Longitude_WGS84"))
-
-## Check col names of melted data
-names(facdat2)
-
-## Insert NAs into empty cells in col 'value'
-facdat2$value[facdat2$value==""]<- NA 
-
-## Add new col for concatenated variable and value cols - this is necessary to ensure unique
-# values in maps, otherwise a 1 for month and sieve size will have the same colour
-facdat3=transform(facdat2,varval=paste0(variable,value))
-
-## Check col names of DF 'facdat3'
-#View(facdat3)
-
-#################################################################################################
-### STEP REF:       13                                                                        ###  
-###                                                                                           ###
-### PAPER SECTION:  METHODS \ The dataset                                                     ###
-###                                                                                           ###
-### TASK:           Figure 11a (Dataset summary: Map of sample by factor)                     ###
-#################################################################################################
-
-## Produce faceted maps based on variables in df 'facdat3'. Colours prescribed manually by
-# identifying the number of levels in each plot (see dataframe factdata3$varval and histogram
-# FIGURE 11b). Colours given using code below. Note that colours are ordered alpabetically by
-# df factdata3$varval.  May need to change order of colours to match histograms.
-levels(facdat3$varval)
-
-## Return a specified number of colours.
-scales::hue_pal()(12) # Enter required number of colours in brackets
-
-## Use this code to allow facet labels to be modified (changing col 'Sieve' to 'Sieve (mm)')
-labels=c(Sector="Sector",Source="Source",Data="Data",Year="Year",Month="Month",Gear="Gear",
-         Sieve="Sieve (mm)",Programme="Programme",Treatment="Treatment")
-
-## Plot maps
-sam.fac=ggplot()+
-  geom_polygon(data=defra.dem.df, aes(x=long, y=lat, group=group,fill=Depth), size=0.15)+
-  scale_fill_manual(values=grey)+
-  geom_point(data=facdat3,aes(Longitude_WGS84,Latitude_WGS84,col=factor(varval)), size=0.01,
-             show.legend = FALSE, alpha=0.4)+
-  geom_polygon(data = euDF2, aes(x=long, y=lat, group = group),fill="white",colour="black",
-               size=0.15)+
-  coord_map(xlim = c(-10.7, 3.6),ylim = c(48.6, 62.7))+
-  labs(x="Longitude",y="Latitude")+
-  theme_bw(base_size=17)+#was 15,16
-  facet_wrap(~variable,labeller=labeller(variable=labels))+
-  scale_colour_manual(values = c("#F8766D","#00BFC4","#F8766D","#CD9600","#7CAE00","#00BE67",
-                                 "#00BFC4","#00A9FF","#C77CFF","#FF61CC","#F8766D","#C77CFF",
-                                 "#F564E3","#FF64B0","#DE8C00","#B79F00","#7CAE00","#00BA38",
-                                 "#00C08B","#00BFC4","#00B4F0","#619CFF","lightsteelblue1",
-                                 "#F8766D","#E58700","#C99800","#A3A500","#6BB100","#00BA38",
-                                 "#00BF7D","#00C0AF","lightsteelblue1","#00BCD8","#00B0F6",
-                                 "#619CFF","#B983FF","#E76BF3","#FD61D1","#FF67A4","#F8766D",
-                                 "#00BFC4","#F8766D","#00BFC4","lightsteelblue1","#F8766D",
-                                 "#E58700","#C99800","#A3A500","#6BB100","#00BA38","#00BF7D",
-                                 "#00C0AF","#00BCD8","#00B0F6","#619CFF","#B983FF","#E76BF3",
-                                 "#FD61D1","#FF67A4","#F8766D","lightsteelblue1","#00BFC4",
-                                 "#F8766D","#F17D52","#E9842C","#E08B00","#D69100","#CA9700",
-                                 "#BC9D00","#ADA200","#9CA700","#87AC00","#6FB000","#4DB400",
-                                 "#00B813","#00BB44","#00BD61","#00BF79","#00C08E","#00C1A2",
-                                 "#00C0B4","#00BFC4","#00BDD4","#00B9E2","#00B5EE","#00AFF8",
-                                 "#00A7FF","#4D9FFF","#7F96FF","#A18BFF","#BC81FF","#D177FF",
-                                 "#E26EF7","#EE67EC","#F863DF","#FE61D0","#FF62BF","#FF65AD",
-                                 "#FF6A9A","#FD7084","lightsteelblue1"))
-
-sam.fac2=sam.fac+guides(fill=FALSE)# removes the bathy legend
-
-## Save plot to an image file (png or tiff)
-png("OUTPUTS/FIGURE 11a.png",width = 14.7,height = 18.8,units = "cm",res = 600, pointsize = 12)
-#tiff("OUTPUTS/FIGURE 11a.tiff",width = 14.7,height = 18.2,units = "cm",res = 600,pointsize = 48)
-sam.fac2
-dev.off()
-
-#################################################################################################
-### STEP REF:       14                                                                        ###  
-###                                                                                           ###
-### PAPER SECTION:  METHODS \ The dataset                                                     ###
-###                                                                                           ###
-### TASK:           Figure 11b (Dataset summary: Histograms to accompany facet maps)          ###
-#################################################################################################
-
-## Plot histograms to accompany above maps (samples by factor)
-p1h= ggplot(data, aes(x=reorder(Sector, -table(Sector)[Sector]),fill=Sector))+
-  geom_bar()+
-  ggtitle("Sector")+
-  guides(fill=FALSE)+
-  scale_x_discrete(labels=c("Industry","Government"))+
-  theme(plot.title = element_text(size=14))+
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  theme(axis.title.x = element_blank())+ # remove x-axis title
-  theme(axis.text.x = element_text(hjust=0.5,vjust=0.5, size=12))+
-  theme(plot.title = element_text(hjust = 0.5))+
-  theme(axis.text.y = element_text(hjust=1, size=12))# centres the plot title
-p2h= ggplot(data, aes(x=reorder(Source, -table(Source)[Source]),fill=Source))+
-  geom_bar()+
-  ggtitle("Source")+
-  guides(fill=FALSE)+
-  scale_x_discrete(labels=c("MA","CEFAS","OW","DEFRA","NRW","EA", "NE","CCW","OG","SNH","JNCC",
-                            "N","DOENI","PH","FRS"))+
-  xlab(label="Source")+
-  theme(plot.title = element_text(size=14))+
-  theme(axis.title.x = element_blank())+ # remove x-axis title
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  theme(axis.text.x = element_text(angle=90, hjust=1,vjust=0.5, size=12))+
-  theme(axis.text.y = element_text(hjust=1, size=12))
-p3h= ggplot(data, aes(x=reorder(Data, -table(Data)[Data]),fill=Data))+
-  geom_bar()+
-  ggtitle("Data")+
-  guides(fill=FALSE)+
-  scale_x_discrete(labels=c("Existing","New"))+
-  xlab(label="New")+
-  theme(plot.title = element_text(size=14))+
-  theme(axis.title.x = element_blank())+ # remove x-axis title
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  theme(axis.text.x = element_text(hjust=0.5,vjust=0.5, size=12))+ 
-  theme(axis.text.y = element_text(hjust=1, size=12))
-p5h= ggplot(data, aes(Year, fill=Year2))+
-  geom_bar()+
-  ggtitle("Year")+
-  guides(fill=FALSE)+
-  xlab(label="Year")+
-  theme(plot.title = element_text(size=14))+
-  theme(axis.title.x = element_blank())+ # remove x-axis title
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  theme(axis.text.x = element_text(angle=90, hjust=1,vjust=0.5, size=12))+
-  theme(axis.text.y = element_text(hjust=1, size=12))
-p6h= ggplot(data, aes(Month, fill=Month))+
-  geom_bar()+
-  scale_fill_hue(na.value = "lightsteelblue1")+
-  ggtitle("Month")+
-  guides(fill=FALSE)+
-  xlab(label="Month")+
-  theme(plot.title = element_text(size=14))+
-  theme(axis.title.x = element_blank())+ # remove x-axis title
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  theme(axis.text.x = element_text(angle=90, hjust=1,vjust=0.5, size=12))+
-  theme(axis.text.y = element_text(hjust=1, size=12))
-p7h= ggplot(data, aes(x=reorder(Gear, -table(Gear)[Gear]),fill=Gear))+
-  geom_bar()+
-  ggtitle("Gear")+
-  guides(fill=FALSE)+
-  xlab(label="Gear")+
-  theme(plot.title = element_text(size=14))+
-  theme(axis.title.x = element_blank())+ # remove x-axis title
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  theme(axis.text.x = element_text(angle=90, hjust=1,vjust=0.5, size=12))+
-  theme(axis.text.y = element_text(hjust=1, size=12))
-p8h= ggplot(data, aes(x=reorder(Sieve, -table(Sieve)[Sieve]),fill=Sieve))+
-  geom_bar()+
-  scale_fill_hue(na.value = "lightsteelblue1")+
-  ggtitle("Sieve (mm)")+
-  guides(fill=FALSE)+
-  xlab(label="Sieve (mm)")+
-  theme(plot.title = element_text(size=14))+
-  theme(axis.title.x = element_blank())+ # remove x-axis title
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  theme(axis.text.x = element_text(angle=90, hjust=1,vjust=0.5, size=12))+
-  theme(axis.text.y = element_text(hjust=1, size=12))
-p9h= ggplot(data, aes(x=reorder(Programme, -table(Programme)[Programme]),fill=Programme))+
-  geom_bar()+
-  scale_fill_hue(na.value = "lightsteelblue1")+
-  ggtitle("Programme")+
-  guides(fill=FALSE)+
-  xlab(label="Programme")+
-  theme(plot.title = element_text(size=14))+
-  theme(axis.title.x = element_blank())+ # remove x-axis title
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  theme(axis.text.x = element_text(angle=90, hjust=1,vjust=0.5, size=12))+
-  theme(axis.text.y = element_text(hjust=1, size=12))
-p10h= ggplot(data, aes(x=reorder(Treatment, -table(Treatment)[Treatment]),fill=Treatment))+
-  geom_bar()+
-  scale_fill_hue(na.value = "lightsteelblue1")+
-  ggtitle("Treatment")+
-  guides(fill=FALSE)+
-  scale_x_discrete(labels=c("Ref","Imp","NA"))+
-  xlab(label="Treatment")+
-  theme(plot.title = element_text(size=14))+
-  theme(axis.title.x = element_blank())+ # remove x-axis title
-  theme(axis.title.y = element_blank())+ # remove y-axis title
-  theme(axis.text.x = element_text(hjust=0.5,vjust=0.5, size=12))+ 
-  theme(axis.text.y = element_text(hjust=1, size=12))
-
-## Save plot to an image file (png of tiff)
-png("OUTPUTS/FIGURE 11b.png", width =1000, height=991)
-#tiff("OUTPUTS/FIGURE 11b.tiff", width =1000, height=991)
-
-## Combine individual plots into one plot
-require(cowplot)
-histo=plot_grid(p1h,p2h,p3h,p5h,p6h,p7h,p8h,p9h,p10h, align = "hv")
-histo
-dev.off()
-
-#################################################################################################
-### STEP REF:       15                                                                        ###  
-###                                                                                           ###
-### PAPER SECTION:  METHODS \ The dataset                                                     ###
-###                                                                                           ###
-### TASK:           Figure 11 Parts a & b combined (Combined plot of sample by factor with    ###
-###                 accompanying histograms)                                                  ###
-###                                                                                           ###
-### NOTES:          Use this code if a plot combining parts a and b is required               ###
-#################################################################################################
-
-require(cowplot)
-
-## Save plot to an image file (png or tiff). Specify number of rows using 'nrow=4'
-png("OUTPUTS/FIGURE 11.png",width=53, height=37, units="cm", res=600)
-#tiff("OUTPUTS/FIGURE 11.tiff",width=53, height=37, units="cm", res=600)
-plot_grid(sam.fac2,histo, labels = c("a)","b)"),nrow = 1,rel_widths = c(1, 1.2),scale = 0.98,
-          label_size = 24,hjust = c(-2,1), vjust = c(0.5,0.5)) #SCALE 0.95, RW 1:1.4
-dev.off()
 
 #################################################################################################
 # # #                                  (E) FAUNAL ANALYSIS                                  # # #
@@ -1054,20 +515,17 @@ dim(data3)# 27622 900
 names(data3) # 2:775
 
 ## Remove samples from the faunal data (df data3) where no fauna present
-data4 = data3[ rowSums(data3[,2:775])!=0, ]
+data4 = data3[ rowSums(data3[,2:4022])!=0, ]
 
 ## Check dimensions of df 'data4'
 dim(data4)#27432 900
-
+names(data4[1,1:10])
 ## Identify (usinig the .csv file) variables with no abundance
 #write.csv(data4,file = "OUTPUTS/data4.csv",row.names=TRUE)
 
 ## Remove variables with no abund (got list from csv file). There will be taxa
 # with no abund as some samples with taxa present have been deleted in gear step above  
-data4.5 <- data4[-c(4,21,32,40,47,57,100,153,157,167,172,175,177,200,204,207,213,237,246,
-                    252,283,294,313,325,362,376,379,381,410,413,414,417,418,426,428,430,446,
-                    448,459,460,469,474,485,486,489,505,508,509,528,556,558,575,578,598,601,
-                    603,605,607,630,633,638,647,675,687,705,709,726,734,760,765,775)]
+data4.5 <- data4[-c(6,14,28,29,32,49,57,66,73,74,78,101,107,109,119,123,124,127,128,129,152,173,179,187,189,200,202,203,210,211,214,227,232,233,245,249,251,252,257,258,269,303,311,312,334,339,344,352,358,359,362,372,375,380,398,405,421,426,447,455,461,468,473,474,478,484,491,492,493,495,510,514,518,519,538,539,545,555,565,566,587,588,589,590,592,593,594,596,599,600,604,605,613,636,640,673,679,684,689,690,713,721,726,731,762,765,776,780,781,782,784,785,790,811,815,819,837,841,848,854,876,879,894,896,915,920,926,935,942,943,955,956,957,958,964,974,976,977,978,980,986,991,997,1006,1011,1013,1015,1021,1028,1030,1037,1044,1060,1061,1063,1064,1104,1112,1114,1129,1130,1136,1140,1152,1167,1176,1189,1192,1193,1206,1210,1212,1213,1219,1223,1262,1274,1275,1289,1319,1325,1326,1327,1330,1343,1346,1347,1368,1376,1379,1388,1390,1391,1395,1400,1404,1409,1412,1424,1436,1472,1473,1475,1479,1492,1494,1496,1527,1529,1533,1539,1541,1549,1562,1573,1578,1584,1585,1586,1588,1589,1620,1623,1627,1629,1631,1642,1644,1646,1658,1661,1670,1674,1686,1688,1691,1699,1720,1734,1755,1758,1759,1760,1783,1786,1787,1789,1791,1794,1797,1798,1803,1817,1819,1824,1825,1827,1829,1842,1850,1851,1852,1866,1867,1871,1885,1888,1889,1890,1891,1896,1898,1899,1906,1907,1909,1911,1914,1920,1921,1940,1944,1946,1947,1948,1960,1961,1962,1963,1964,1982,1984,1988,1996,2005,2012,2013,2018,2032,2034,2035,2037,2060,2065,2080,2096,2105,2109,2123,2124,2125,2147,2159,2160,2163,2183,2198,2202,2209,2210,2218,2224,2225,2234,2235,2239,2240,2242,2267,2269,2273,2284,2288,2293,2294,2299,2309,2312,2322,2323,2324,2325,2326,2330,2339,2341,2346,2347,2349,2361,2367,2376,2379,2387,2388,2393,2403,2406,2407,2408,2411,2412,2413,2426,2441,2445,2458,2467,2486,2495,2496,2506,2512,2524,2525,2530,2542,2545,2561,2563,2577,2578,2581,2606,2607,2608,2609,2613,2625,2627,2630,2633,2634,2636,2637,2640,2642,2643,2644,2645,2646,2647,2651,2653,2657,2660,2669,2673,2680,2683,2685,2686,2698,2715,2718,2737,2751,2752,2758,2759,2768,2769,2784,2786,2787,2788,2795,2797,2800,2815,2820,2822,2839,2846,2848,2871,2874,2892,2898,2915,2916,2922,2923,2931,2941,2954,2959,2962,2964,2968,2981,2987,2990,3017,3020,3022,3024,3034,3035,3036,3041,3048,3057,3060,3092,3102,3120,3127,3130,3131,3133,3134,3167,3175,3181,3184,3185,3186,3187,3190,3191,3194,3198,3215,3218,3224,3227,3233,3242,3244,3245,3247,3248,3251,3258,3269,3278,3303,3315,3316,3329,3330,3331,3332,3336,3362,3381,3415,3441,3490,3497,3499,3502,3503,3509,3515,3516,3519,3532,3561,3570,3573,3576,3577,3580,3603,3610,3614,3619,3628,3633,3635,3643,3671,3681,3683,3687,3694,3698,3721,3723,3728,3729,3730,3731,3736,3737,3746,3750,3762,3763,3779,3782,3785,3819,3837,3840,3858,3867,3890,3897,3903,3904,3907,3917,3931,3941,3942,3943,3947,3950,3951,3952,3953,3955,3959,3962,3979,3981,3995,3999,4003,4006,4015,4016,4017,4019,4022)]
 
 ## Check dimensions of df 'data4.5'
 dim(data4.5)# 27432 829
@@ -1076,7 +534,7 @@ dim(data4.5)# 27432 829
 names(data4.5)  
 
 ## Faunal subset (ie remove Sample,Latitude_WGS84, Longitude_WGS84, month and year)
-data5=data4.5[,2:704]
+data5=data4.5[,2:3434]
 
 ## Check dimensions of df 'data5'
 dim(data5) #27432 703
