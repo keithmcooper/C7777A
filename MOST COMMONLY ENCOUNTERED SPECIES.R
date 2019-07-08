@@ -547,16 +547,29 @@ View(data5)
 data5[data5 == 0] <- NA
 
 ##colsums
-counts=colSums(!is.na(data5))
+#counts=colSums(!is.na(data5))
+counts=as.data.frame(colSums(!is.na(data5)))
 View(counts)
 
-## Creat a df for counts using species names and results of col sims
+colnames(counts)[1] <- "Counts"
+counts$ScientificName_accepted <- rownames(counts)
 
-cbind(data5$)
-##Add column names to df 'counts'
-class(counts)
-counts=as.data.frame(counts)
-colnames(counts)=c("ScientificName_accepted", "Count")
+## Drop rownames
+rownames(counts) <- NULL
+
+## Update colum order
+counts2=counts[,2:1]
+View(counts2)
+#
+# Create a version of agg with o duplicates
+names(agg)
+dim(agg)
+agg2=agg[,c(12:20)]
+
 ##Add aggregation data
 
-test=merge(counts, agg, by="ScientificName_accepted")
+test=merge(counts,agg2,  by="ScientificName_accepted")
+View(test)
+test2=unique(test)
+dim(test2)
+View(test2)
