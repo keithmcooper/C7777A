@@ -560,16 +560,10 @@ rownames(counts) <- NULL
 ## Update colum order
 counts2=counts[,2:1]
 View(counts2)
-#
-# Create a version of agg with o duplicates
-names(agg)
-dim(agg)
-agg2=agg[,c(12:20)]
 
-##Add aggregation data
+## Save as .csv
+write.csv(counts2,file = "OUTPUTS/Most commonly occurring taxa big dataset.csv",row.names=TRUE)
 
-test=merge(counts,agg2,  by="ScientificName_accepted")
-View(test)
-test2=unique(test)
-dim(test2)
-View(test2)
+
+
+
