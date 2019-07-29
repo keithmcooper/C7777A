@@ -467,7 +467,7 @@ data[1] <- NULL
 dim(data)#33198 900
 
 ## View dataset
-View(data)
+#View(data)
 
 ## Change variable data types (factors required for plotting).
 data$Sieve = as.factor(data$Sieve)
@@ -531,17 +531,25 @@ data4.5 <- data4[-c(6,14,28,29,32,49,57,66,73,74,78,101,107,109,119,123,124,127,
 dim(data4.5)# 27432 829
 
 ## Show names of df 'data4.5'
-names(data4.5)  
+options(max.print=10000)
+names(data4.5)
+dim(data4.5)
+
+## Remove samples not in North Sea. Bounding box from http://www.marineregions.org/gazetteer.php?p=details&id=2350 50.9954
+data4.6=subset(data4.5,Latitude_WGS84>50.9954 & Latitude_WGS84<61.017)
+data4.7=subset(data4.6,Longitude_WGS84>-4.4454 & Longitude_WGS84<12.0059)
+dim(data4.7) #16514  3560
 
 ## Faunal subset (ie remove Sample,Latitude_WGS84, Longitude_WGS84, month and year)
-data5=data4.5[,2:3434]
+names(data4.7)
+data5=data4.7[,2:3434]
 
 ## Check dimensions of df 'data5'
 dim(data5) #27432 703
 
 ## Check df 'data5' is just the faunal data
 names(data5)# it is
-View(data5)
+#View(data5)
 ## Now find which species is most common
 ## replace all 0 with NA
 data5[data5 == 0] <- NA
@@ -549,7 +557,7 @@ data5[data5 == 0] <- NA
 ##colsums
 #counts=colSums(!is.na(data5))
 counts=as.data.frame(colSums(!is.na(data5)))
-View(counts)
+#View(counts)
 
 colnames(counts)[1] <- "Counts"
 counts$ScientificName_accepted <- rownames(counts)
@@ -559,10 +567,15 @@ rownames(counts) <- NULL
 
 ## Update colum order
 counts2=counts[,2:1]
-View(counts2)
+#View(counts2)
+
+## Remove records with zero abundance
+counts2[counts2==0] <- NA
+#View(counts3)
+counts3<-counts2[complete.cases(counts2),]
 
 ## Save as .csv
-write.csv(counts2,file = "OUTPUTS/Most commonly occurring taxa big dataset.csv",row.names=TRUE)
+write.csv(counts3,file = "OUTPUTS/Most commonly occurring taxa big dataset North Sea.csv",row.names=TRUE)
 
 
 
